@@ -8,8 +8,6 @@ import {
 
 import { DocumentationService } from './documentation.service';
 
-import { GenerateDocDto } from './dto/generate-doc.dto';
-
 @Controller('docs')
 export class DocumentationController {
   constructor(private readonly documentationService: DocumentationService) {}
@@ -20,7 +18,9 @@ export class DocumentationController {
     client: string,
 
     @Body()
-    body: GenerateDocDto,
+    body: {
+      messages: any[];
+    },
   ) {
     if (client !== `vscode-extension`) {
       throw new BadRequestException('Invalid Requests');

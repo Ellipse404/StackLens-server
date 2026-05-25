@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 
@@ -19,7 +20,7 @@ export class DocumentationService {
   //   };
   // }
 
-  async generateDocumentation(payload: any[]) {
+  async generateDocumentation(payload: { messages: any[] }) {
     try {
       const response = await groqClient.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
