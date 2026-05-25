@@ -1,48 +1,56 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 
 import { groqClient } from '../../providers/groq/groq.provider';
 
 @Injectable()
 export class DocumentationService {
-  async generateDocumentation(code: string, language: string) {
-    const response = await groqClient.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+  // async generateDocumentation(payload: any) {
+  //   const response = await groqClient.chat.completions.create({
+  //     model: 'llama-3.3-70b-versatile',
 
-      temperature: 0,
+  //     temperature: 0,
+  //     max_tokens: 300, // TODO: exp
+  //     messages: payload.messages,
+  //   });
 
-      messages: [
-        {
-          role: 'system',
+  //   return {
+  //     documentation: (response.choices[0]?.message?.content || '').trim(),
+  //   };
+  // }
 
-          content: `
-You are an elite software documentation AI.
+  async generateDocumentation(payload: any[]) {
+    try {
+      const response = await groqClient.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
 
-Generate highly accurate production-grade documentation comments.
+        temperature: 0,
 
-Rules:
-- understand actual behavior
-- infer intent from logic
-- generate concise enterprise-level docs
-- include params and returns
-- NEVER generate generic comments
-- return ONLY the documentation comment
-`,
-        },
+        max_tokens: 300, //TODO: exp
 
-        {
-          role: 'user',
+        messages: payload?.messages,
+      });
 
-          content: `
-Language:
-${language}
+      return (response.choices[0]?.message?.content || '').trim();
+    } catch (error: any) {
+      // Retry once on rate limit
+      if (error?.status === 429) {
+        await new Promise((r) => setTimeout(r, 2000));
 
-Code:
-${code}
-`,
-        },
-      ],
-    });
+        const retry = await groqClient.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
 
-    return (response.choices[0]?.message?.content || '').trim();
+          temperature: 0,
+
+          max_tokens: 300,
+
+          messages: payload?.messages,
+        });
+
+        return (retry.choices[0]?.message?.content || '').trim();
+      }
+
+      throw error;
+    }
   }
 }

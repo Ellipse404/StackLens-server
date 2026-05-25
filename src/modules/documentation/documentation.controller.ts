@@ -1,38 +1,31 @@
 import {
+  BadRequestException,
   Body,
   Controller,
-  Post,
   Headers,
-  UnauthorizedException,
+  Post,
 } from '@nestjs/common';
 
 import { DocumentationService } from './documentation.service';
 
 import { GenerateDocDto } from './dto/generate-doc.dto';
 
-@Controller('api/v1/ai/documentation')
+@Controller('docs')
 export class DocumentationController {
   constructor(private readonly documentationService: DocumentationService) {}
 
-  @Post()
+  @Post('generate')
   async generate(
-    @Body() body: GenerateDocDto,
-
     @Headers('x-stacklens-client')
-    clientSecret: string,
+    client: string,
+
+    @Body()
+    body: GenerateDocDto,
   ) {
-    if (clientSecret !== process.env.STACKLENS_CLIENT_SECRET) {
-      throw new UnauthorizedException();
+    if (client !== `vscode-extension`) {
+      throw new BadRequestException('Invalid Requests');
     }
 
-    const result = await this.documentationService.generateDocumentation(
-      body.code,
-      body.language,
-    );
-
-    return {
-      success: true,
-      result,
-    };
+    return this.documentationService.generateDocumentation(body);
   }
 }

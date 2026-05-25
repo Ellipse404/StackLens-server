@@ -1,10 +1,6 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsArray } from 'class-validator';
 
 export class GenerateDocDto {
-  @IsString()
-  language!: string;
-
-  @IsString()
-  @MaxLength(25000)
-  code!: string;
+  @IsArray()
+  messages!: any[];
 }
