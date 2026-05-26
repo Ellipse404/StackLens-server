@@ -1,8 +1,8 @@
 {
   "name": "stacklens-server",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "0.0.2",
+  "description": "stacklens server",
+  "author": "bhaskarneogi",
   "private": true,
   "license": "UNLICENSED",
   "engines": {

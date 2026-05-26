@@ -8,6 +8,8 @@ import {
 
 import { DocumentationService } from './documentation.service';
 
+import { GenerateDocDto } from './dto/generate-doc.dto';
+
 @Controller('docs')
 export class DocumentationController {
   constructor(private readonly documentationService: DocumentationService) {}
@@ -18,14 +20,19 @@ export class DocumentationController {
     client: string,
 
     @Body()
-    body: {
-      messages: any[];
-    },
+    body: GenerateDocDto,
   ) {
-    if (client !== `vscode-extension`) {
-      throw new BadRequestException('Invalid Requests');
+    if (client !== 'vscode-extension') {
+      throw new BadRequestException('Invalid request');
     }
 
-    return this.documentationService.generateDocumentation(body);
+    const documentation =
+      await this.documentationService.generateDocumentation(body);
+
+    return {
+      success: true,
+
+      documentation,
+    };
   }
 }
